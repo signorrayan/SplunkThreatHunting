@@ -2,4 +2,4 @@
 This repository contains Splunk queries for ThreatHunters.
 
 
-Contributing is always welcome..
+* Contributing is always welcome.
