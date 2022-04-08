@@ -1,0 +1,8 @@
+index=zeek query=* NOT dest IN ("8.8.8.8", "4.2.2.4", "4.2.2.2")
+| mvexpand query 
+| eval queryLength=len(query)
+| where queryLength > 20
+| stats count by queryLength, src, dest
+| sort -queryLength, count
+| fields src dest queryLength count
+| head 80
