@@ -1,0 +1,4 @@
+index=sysmon EventCode=3 source="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational"  NOT process_exec IN ("Microsoft.SharePoint.exe", "AgentUpgrader.exe", "OneDrive.exe"m "OneDriveStandaloneUpdater.exe")
+| fields User, SourceIp, DestinationIp, DestinationPort, process_exec, DestinationPortName, protocol, direction, count
+| stats count VALUES(protocol) as protocol by process_exec, User, SourceIp, DestinationIp, DestinationPort, DestinationPortName, direction 
+| sort -_time 
