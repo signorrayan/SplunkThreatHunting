@@ -1,0 +1,8 @@
+# To detect encapsulated IPv6 datagram packets within IPv4 (teredo tunneling).
+
+
+index=zeek action="Tunnel::DISCOVER" tunnel_type="Tunnel::IP" 
+| eval idx="zeek"
+| append [search index=suricata "alert.signature"="ET POLICY Protocol 41 IPv6 encapsulation potential 6in4 IPv6 tunnel active" | stats count VALUES(dest) as dest by src src_port dest_port proto| eval idx="suricata"]
+| stats count VALUES(dest) as dest VALUES(idx) as idx VALUES(proto) as proto by src src_port dest_port
+| table src src_port dest dest_port tunnel_type proto idx count | sort -count
