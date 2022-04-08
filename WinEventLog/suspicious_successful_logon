@@ -1,0 +1,13 @@
+index=wineventlog source=WinEventLog:Security EventCode=4624 NOT Account_Name IN ("-", "*$$")
+((Logon_Type=10 Source_Network_Address IN ("127.*", ::1)) ```  mostly RDP tunneling ```
+OR
+(Logon_Type=10 Source_Network_Address!="10.0.0.0/24") ``` Remote Interactive ```
+OR
+(Logon_Type IN (3, 10) Workstation_Name=*)) ``` Only if both source work station names and destination are end user machines ```
+```OR
+(Logon_Type IN (10 , 2) Account_Name="*$$"))  Type 2 ( A user logged on to this computer ) and account name has ends with $$ , Example: SOC$$ , Possible fake machine account. ```
+ | stats count VALUES(Source_Network_Address) AS Source_Network_Address by Workstation_Name Account_Name Logon_Type 
+ | eval Description = 
+     CASE((Logon_Type=3),"Logged on from the network",
+         (Logon_Type=10 AND Source_Network_Address="127.*"), "Mostly RDP tunneling",
+             1<2, "Should be attend!") | table Account_Name Workstation_Name Source_Network_Address Logon_Type Description count | sort -count | where count>5
