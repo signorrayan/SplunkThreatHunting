@@ -1,0 +1,22 @@
+# Requests to Mailserver and attached malware
+
+index=fortigate app!="PING" action!=allowed
+        (dstport=25) NOT srcip IN (10.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, 100.64.0.0/10)
+| stats
+    earliest(_time) as earliest 
+    latest(_time) as latest 
+    values(action) as action 
+    values(app) as app 
+    values(dest_port) as dest_port 
+    values(sourcetype) as sourcetype
+    values(filename) as filename
+    count 
+    by srcip dstip
+| eventstats max(latest) as maxlatest
+    ```This is 2022-04-09 00:00:00``` 
+    ``` 
+| eval comparisonTime="-1d@d" ``` 
+| eval isOutlier=if(earliest >= relative_time(maxlatest, comparisonTime), 1, 0)
+| sort -count
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest),ctime(latest) ,ctime(maxlatest)
+| table earliest, latest, srcip, dstip, dest_port, app, action, filename, sourcetype, isOutlier, count, maxlatest
