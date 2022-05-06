@@ -1,0 +1,3 @@
+index=sysmon EventCode=22 NOT QueryName IN ("*.office.com", "*amazonaws.com", "*cloudfront.aws.a2z.com", "*cloudapp.azure.com", "*dropbox.com", "*cloudflare.net") 
+| stats count by Computer QueryName 
+| where len(QueryName) > 32
