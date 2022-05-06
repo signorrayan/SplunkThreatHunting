@@ -1,0 +1,4 @@
+index=zeek source="/var/log/nsm/zeek/current/dns.log"  query="*.*"  NOT query IN ("*.microsoft.com", "*.firefox.com", "*.live.com", "*.mikrotik.com", "*.vmware.com", "*.windowsupdate.com", "*.root-servers.net", "*.googleapis.com", "*.intel.com", "*.centos.com", "*.in-addr.arpa", "*.google.com", "*.symantec.com", "*.mozilla.com", "*.mozilla.net", "*.mozilla.org", "*.akamai.net", "*.norton.com", "*.ntp.org", "*.edgekey.net", "*.eset.com", "*.msn.com", "*.centos.org", "*.trafficmanager.net", "*.akadns.net", "*.yahoo.com", "*.cisco.com", "*.yahoodns.net", "*.azure.com","*.skype.com","*.gstatic.com","*.office.com", "dns.msftncsi.com", "*.cwfservice.net","*.mozaws.net", "*grafana.com","*.cloudapp.net","github.com","*.akamaiedge.net","*.verisign.com","*.anydesk.com","*.adobe.com", "*.cloudfront.net","*.ip6.arpa","*.mozgcp.net")
+| stats sparkline count by query 
+| sort -count
+
