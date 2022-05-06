@@ -1,0 +1,3 @@
+index=zeek service=* NOT service IN ("*$", "*_*", "*,*", "*.*", "*/*") 
+| chart count AS Requests over service by dest_port
+| sort -count
