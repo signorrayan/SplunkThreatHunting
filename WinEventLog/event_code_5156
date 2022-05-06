@@ -1,0 +1,6 @@
+# EventCode 5156 to detect process connections.
+
+index=wineventlog EventCode=5156 NOT Application_Name IN ("system", "*windows\\system32\\svchost.exe", "*\\program files\\splunkuniversalforwarder\\bin\\splunkd.exe", "*\\program files \(x86\)\\symantec\\symantec endpoint protection*", "\\device\\harddiskvolume2\\program files \(x86\)\\common files\\solarwinds\\*.exe", "\\device\\harddiskvolume2\\program files \(x86\)\\solarwinds\\*.exe", "*\\program files \(x86\)\\google\\update\\googleupdate.exe", "\\device\\harddiskvolume2\\program files \(x86\)\\veeam\\backup transport\\x64\\veeamagent.exe") NOT Source_Address IN ("::1", "127.0.0.1", "fe80::*") NOT Destination_Address IN ("10.0.0.0/8","172.16.0.0/12", "224.0.0.251", "224.0.0.252", "127.0.0.1", "	192.168.200.*") 
+| fields Application_Name Source_Address Destination_Address Destination_Port Direction status 
+| stats count by Application_Name Source_Address Destination_Address Destination_Port Direction status 
+| sort +count
