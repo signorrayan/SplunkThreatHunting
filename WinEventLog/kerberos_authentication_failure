@@ -1,0 +1,19 @@
+# To detect unsuccessful authentication attempts.
+
+index=wineventlog source=WinEventLog:Security EventCode IN (4768, 4771)
+| regex user="\w+\.\w+"
+| eval FailureResultCode=mvappend(Failure_Code, Result_Code)
+| stats count
+        earliest(_time) as earliest 
+        latest(_time) as latest
+        by user  FailureResultCode
+| eval  description = CASE((FailureResultCode="0x18"),"Pre-authentication information was invalid (bad password)",
+                          (FailureResultCode="0x25"),"Workstation’s clock too far out of sync with the DC’s",
+                          (FailureResultCode="0x12"),"Account disabled, expired, locked out, logon hours",
+                          (FailureResultCode="0x17"),"The user’s password has expired",
+                          (FailureResultCode="0x6"),"Bad user name, or new computer/user account has not replicated to DC yet",
+                          1<2, "Should be attend!")
+| where FailureResultCode!="0x0"
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest),ctime(latest)
+| sort -latest
+| table earliest, latest, user, FailureResultCode, description, count
