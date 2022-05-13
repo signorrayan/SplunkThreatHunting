@@ -1,7 +1,6 @@
 # To detect unsuccessful authentication attempts.
 
-index=wineventlog source=WinEventLog:Security EventCode IN (4768, 4771)
-| regex user="\w+\.\w+"
+index=wineventlog source=WinEventLog:Security EventCode IN (4768, 4771) user!="*$"
 | eval FailureResultCode=mvappend(Failure_Code, Result_Code)
 | stats count
         earliest(_time) as earliest 
