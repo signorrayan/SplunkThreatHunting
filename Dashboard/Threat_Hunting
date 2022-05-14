@@ -1,0 +1,718 @@
+<dashboard theme="light">
+  <label>ThreatHunting</label>
+  <row>
+    <panel>
+      <title>EventCode_4624_4625</title>
+      <chart>
+        <search>
+          <query>index=wineventlog EventCode IN (4624, 4625) | timechart span=10m count as count by EventCode</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">auto</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">4625</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisStart</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">0</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Kerberos_Authentication_Failure_Chart</title>
+      <chart>
+        <search>
+          <query>index=wineventlog source=WinEventLog:Security EventCode IN (4768, 4771) user!="*$$"
+
+| timechart span=10m count as events by EventCode</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">4768</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisStart</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Windows_Unsuccessful_Login</title>
+      <table>
+        <search>
+          <query>index=wineventlog source=WinEventLog:Security EventCode=4625 NOT Account_Name IN ("*$") Logon_Type IN (3, 10) 
+| stats count  by user Workstation_Name Source_Network_Address Sub_Status Logon_Type
+| eval Description = if(Logon_Type=3,"Logged on from the network", "Logged on remotely") 
+| table user Workstation_Name Source_Network_Address Sub_Status Description count 
+| sort -count 
+| where count&gt;12</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Description">
+          <colorPalette type="map">{"Logged on from the network":#708794}</colorPalette>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Windows_Unsuccessful_Login_Diagram</title>
+      <viz type="sankey_diagram_app.sankey_diagram">
+        <search>
+          <query>index=wineventlog source=WinEventLog:Security EventCode=4625 NOT Account_Name IN ("*$$")  Logon_Type IN (3, 10) 
+| stats count by user  Source_Network_Address | where count&gt;11</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="sankey_diagram_app.sankey_diagram.colorMode">sequential</option>
+        <option name="sankey_diagram_app.sankey_diagram.maxColor">#dc4e41</option>
+        <option name="sankey_diagram_app.sankey_diagram.minColor">#f8be34</option>
+        <option name="sankey_diagram_app.sankey_diagram.numOfBins">4</option>
+        <option name="sankey_diagram_app.sankey_diagram.showBackwards">false</option>
+        <option name="sankey_diagram_app.sankey_diagram.showLabels">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.showLegend">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.showSelf">false</option>
+        <option name="sankey_diagram_app.sankey_diagram.showTooltip">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.styleBackwards">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.useColors">true</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Kerberos_Authentication_Failure</title>
+      <table>
+        <search>
+          <query>index=wineventlog source=WinEventLog:Security EventCode IN (4768, 4771)
+| regex user="\w+\.\w+"
+| eval FailureResultCode=mvappend(Failure_Code, Result_Code)
+| stats count
+        earliest(_time) as earliest 
+        latest(_time) as latest
+        by user  FailureResultCode
+| eval  description = CASE((FailureResultCode="0x18"),"Pre-authentication information was invalid (bad password)",
+                          (FailureResultCode="0x25"),"Workstation’s clock too far out of sync with the DC’s",
+                          (FailureResultCode="0x12"),"Account disabled, expired, locked out, logon hours",
+                          (FailureResultCode="0x17"),"The user’s password has expired",
+                          (FailureResultCode="0x6"),"Bad user name, or new computer/user account has not replicated to DC yet",
+                          1&lt;2, "Should be attend!")
+| where count &gt; 10 AND FailureResultCode!="0x0"
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest),ctime(latest)
+| sort -count
+| table earliest, latest, user, FailureResultCode, description, count</query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="description">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Kerberos_Relay_Up_Activity</title>
+      <event>
+        <search>
+          <query>index=wineventlog EventCode=4624 Authentication_Package="Kerberos" Logon_Type=3 Security_ID="*500" Source_Network_Address IN ("127.0.0.1","::1")</query>
+          <earliest>-120m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">50</option>
+        <option name="list.drilldown">none</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">1</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>SMTP_Requests</title>
+      <table>
+        <search>
+          <query>index=fortigate app!="PING"
+        dstport IN (25,467,587) (srcip!=10.0.0.0/8 dstip!=srcip.16.0.0/12 srcip!=192.168.0.0/16 srcip!=100.64.0.0/10 srcip!=8.8.8.8 srcip!=4.2.2.4 srcip!=8.8.4.4)
+| stats
+    earliest(_time) as earliest 
+    latest(_time) as latest 
+    values(action) as action 
+    values(app) as app 
+    values(dest_port) as dest_port 
+    values(sourcetype) as sourcetype
+    values(filename) as filename
+    count 
+    by srcip dstip
+| eventstats max(latest) as maxlatest
+    ```This is 2021-12-09 00:00:00``` 
+    ``` 
+| eval comparisonTime="-1d@d" ``` 
+| eval isOutlier=if(earliest &gt;= relative_time(maxlatest, comparisonTime), 1, 0)
+| sort -count
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest),ctime(latest) ,ctime(maxlatest)
+| table earliest, latest, srcip, dstip, dest_port, app, action, filename, sourcetype, isOutlier, count, maxlatest</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="dest_port">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="action">
+          <colorPalette type="map">{"blocked":#DC4E41,"allowed":#53A051}</colorPalette>
+        </format>
+        <format type="color" field="app">
+          <colorPalette type="map"></colorPalette>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#53A051" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="srcip">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>New_User_Creation</title>
+      <table>
+        <search>
+          <query>index=wineventlog source=WinEventLog:Security EventCode=4720 | table _time host user_name SAM_Account_Name | sort -_time | rename user_name AS Creator SAM_Account_Name AS Created_Account</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Suspicious_Successful_Logons</title>
+      <table>
+        <search>
+          <query>index=wineventlog source=WinEventLog:Security EventCode=4624 Account_Name!="-" Account_Name!="*$$"
+((Logon_Type=10 Source_Network_Address IN ("127.*", ::1)) ```  mostly RDP tunneling ```
+OR
+(Logon_Type=10 Source_Network_Address!="10.0.0.0/24") ``` Remote Interactive ```
+OR
+(Logon_Type IN (3, 10) Workstation_Name=*)) ``` Only if both source work station names and destination are end user machines ```
+```OR
+(Logon_Type IN (10 , 2) Account_Name="*$$"))  Type 2 ( A user logged on to this computer ) and account name has ends with $$ , Example: SOC$$ , Possible fake machine account. ```
+ | stats count VALUES(Source_Network_Address) AS Source_Network_Address by Workstation_Name Account_Name Logon_Type 
+ | eval Description = 
+     CASE((Logon_Type=3),"Logged on from the network",
+         (Logon_Type=10 AND Source_Network_Address="127.*"), "Mostly RDP tunneling",
+             1&lt;2, "Should be attend!") | table Account_Name Workstation_Name Source_Network_Address Logon_Type Description count | sort -count | where count&gt;5</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Description">
+          <colorPalette type="map">{"Logged on from the network":#708794}</colorPalette>
+        </format>
+        <format type="color" field="Logon_Type">
+          <colorPalette type="map"></colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Suspicious_Domain_Query</title>
+      <table>
+        <search>
+          <query>index=sysmon EventCode=22 QueryName="*.*" NOT QueryName IN ("*.office.com", "*amazonaws.com", "*cloudfront.aws.a2z.com", "*cloudapp.azure.com", "*dropbox.com", "*cloudflare.net") 
+| stats count by Computer QueryName
+| sort -_time</query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Computer">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Sysmon_Network_Connections</title>
+      <table>
+        <search>
+          <query>index=sysmon EventCode=3 source="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" 
+| stats count VALUES(protocol) as protocol by process_exec, User, SourceIp, DestinationIp, DestinationPort, DestinationPortName, direction 
+| sort -_time
+| table User, SourceIp, DestinationIp, DestinationPort, process_exec, DestinationPortName, protocol, direction, count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="process_exec">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="list">[#53A051,#006D9C,#F8BE34,#F1813F,#DC4E41]</colorPalette>
+          <scale type="threshold">0,30,70,100</scale>
+        </format>
+        <format type="color" field="DestinationPortName">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Services_Ports</title>
+      <table>
+        <search>
+          <query>index=zeek service=* NOT service IN ("*$$", "*_*", "*,*", "*.*", "*/*") 
+| chart count AS Requests over service by dest_port | sort -count</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>DNS_DataExfiltration</title>
+      <table>
+        <search>
+          <query>index=zeek query=* NOT query IN ("*.172.in-addr.arpa", "*.10.in-addr.arpa", "*.192.in-addr.arpa", "*.amazonaws.com", "*.ip6.arpa", "*.microsoft.com", "*.akadns.net", "*.azureedge.us", "*.dropbox.com", "*.smg.ultra.brightmail.com", "*.office.com","*cloudfront.aws.a2z.com", "*cloudapp.azure.com", "*cafebazaar.cloud", "*cloudflare.net", "*.trafficmanager.net", "*.edgekey.net", "") 
+| mvexpand query 
+| eval queryLength=len(query)
+| where queryLength &gt; 40
+| stats count values(query) as queries by queryLength, src, dest
+| sort -queryLength, count
+| fields src dest queries queryLength count
+| head 80</query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="queryLength">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>EventCode_5156</title>
+      <table>
+        <search>
+          <query>index=wineventlog EventCode=5156 NOT Source_Address IN ("::1", "127.0.0.1", "fe80::*") NOT Destination_Address IN ("10.0.0.0/8","172.16.0.0/12", "224.0.0.251", "224.0.0.252", "127.0.0.1", "	192.168.200.*") 
+| fields Application_Name Source_Address Destination_Address Destination_Port Direction status 
+| stats count by Application_Name Source_Address Destination_Address Destination_Port Direction status 
+| sort +count</query>
+          <earliest>-2h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>15m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="status">
+          <colorPalette type="map">{"success":#53A051}</colorPalette>
+        </format>
+        <format type="color" field="Destination_Port">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Source_Address">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Application_Name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Teredo_Tunneling_IPv6_Over_IPv4</title>
+      <table>
+        <search>
+          <query>index=zeek action="Tunnel::DISCOVER" tunnel_type="Tunnel::IP" 
+| eval idx="zeek"
+| append [search index=suricata "alert.signature"="ET POLICY Protocol 41 IPv6 encapsulation potential 6in4 IPv6 tunnel active" | stats count VALUES(dest) as dest by src src_port dest_port proto| eval idx="suricata"]
+| stats count VALUES(dest) as dest VALUES(idx) as idx VALUES(proto) as proto by src src_port dest_port
+|  head 10
+| table src src_port dest dest_port tunnel_type proto idx count | sort -count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>DNS_queries_sparkline</title>
+      <table>
+        <search>
+          <query>index=zeek source="/var/log/nsm/zeek/current/dns.log" NOT query IN ("*.microsoft.com", "*.firefox.com", "*.live.com", "*.mikrotik.com", "*.vmware.com", "*.windowsupdate.com", "*.root-servers.net", "*.googleapis.com", "*.intel.com", "*.centos.com", "*.in-addr.arpa", "*.google.com", "*.symantec.com", "*.mozilla.com", "*.mozilla.net", "*.mozilla.org", "*.akamai.net", "*.norton.com", "*.ntp.org", "*.edgekey.net", "*.eset.com", "*.msn.com", "*.centos.org", "*.trafficmanager.net", "*.akadns.net", "*.yahoo.com", "*.cisco.com", "*.yahoodns.net", "*.azure.com","*.skype.com","*.gstatic.com","*.office.com", "dns.msftncsi.com", "*.cwfservice.net","*.mozaws.net", "*grafana.com","*.cloudapp.net","github.com","*.akamaiedge.net","*.verisign.com","*.anydesk.com","*.adobe.com","*.arvancloud.com", "*.cloudfront.net","*.ip6.arpa","*.abplus.net","*.mozgcp.net") query="*.*" 
+| stats sparkline count by query 
+| sort -count</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Files_Over_Network_Inbound</title>
+      <table>
+        <search>
+          <query>index=zeek  source="/var/log/nsm/zeek/current/files.log" mime_type IN (application/x-7z-compressed, application/zip, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/x-tar, application/x-sh, application/vnd.rar, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.apple.installer+xml, text/javascript, application/java-archive, application/gzip, application/msword, application/x-csh, application/x-bzip2, application/octet-stream) NOT rx_hosts{} IN ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "104.66.89.155", "114.119.189.29", "142.250.180.35", "142.250.181.163", "142.250.184.195", "142.250.185.35") tx_hosts{}="10.0.0.0/8" | stats sparkline count by rx_hosts{} tx_hosts{} mime_type sha1 | sort -count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="mime_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Files_Over_Network_Outbound</title>
+      <table>
+        <search>
+          <query>index=zeek source="/var/log/nsm/zeek/current/files.log" mime_type IN (application/x-7z-compressed, application/zip, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/x-tar, application/x-sh, application/vnd.rar, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.apple.installer+xml, text/javascript, application/java-archive, application/gzip, application/msword, application/x-csh, application/x-bzip2, application/octet-stream) NOT tx_hosts{} IN ("10.0.0.0/8", "172.16.0.0/12", "104.66.89.155", "114.119.189.29", "142.250.180.35", "142.250.181.163", "142.250.184.195", "142.250.185.35", "163.171.132.202", "192.168.0.0/16", "77.104.125.190", "163.171.137.16", "163.171.132.42")  
+| stats sparkline count by rx_hosts{} tx_hosts{} mime_type sha1 
+| sort -count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>5m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="mime_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>MySQL_logs</title>
+      <table>
+        <search>
+          <query>index=zeek  source="/var/log/nsm/zeek/current/mysql.log" | stats latest(_time) as QTime count values(response) as response by src dest arg | convert ctime(QTime) | table QTime src dest arg response count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Arvan_Crawling_Detection</title>
+      <table>
+        <search>
+          <query>index=arvan uri IN ("*.php", "*.asp", "*.html", "*.aspx", "*admin*", "*backup*") NOT uri IN ("*wp-login.php", "/applications/Common/pages/clientEventHandlers.aspx", "/include/*", "/Loader.aspx", "/applications/*", "/Userlogin.aspx", "/owa/auth/logon.aspx") status IN (200,301,302)
+| stats count by ip domain uri referer method status _time 
+| sort -_time 
+| rename _time AS ETime
+| convert ctime(ETime) 
+| table ETime ip method domain uri referer status</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>2m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Unauthorized_Query_sl/ANY/IN</title>
+      <table>
+        <search>
+          <query>index=zeek source="/var/log/nsm/zeek/current/dns.log" qtype=255 
+|  stats count VALUES(query) as queries by src_ip
+| sort -count
+| table src_ip queries count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>
