@@ -1,1 +1,1 @@
-README.md
+Dashboard XML file is placed here.
