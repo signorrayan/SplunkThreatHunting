@@ -1,0 +1,14 @@
+# To detect possible Remote Code Execution
+
+index=zeek source="/var/log/nsm/zeek/current/http.log" uri=* method=POST id.resp_h="10.0.0.0/8" NOT id.orig_h IN ("10.0.0.0/8", "172.16.0.0/12") NOT (method=GET AND uri="/")
+| stats count
+        earliest(_time) AS earliest
+        VALUES(origin) as origin 
+        VALUES(referrer) AS referrer 
+        VALUES(request_body_len) AS request_body_len 
+        VALUES(response_body_len) AS response_body_len 
+        VALUES(status_code) AS status_code 
+        by src dest uri _time method
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest)
+| sort -_time
+| table earliest src dest uri method request_body_len response_body_len origin referer status_code
