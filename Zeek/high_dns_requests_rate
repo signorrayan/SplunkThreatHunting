@@ -1,0 +1,6 @@
+index=zeek source="/var/log/nsm/zeek/current/dns.log" dest_port="53" NOT query IN ("*.10.in-addr.arpa", "*.172.in-addr.arpa", ""*.168.192.in-addr.arpa") 
+| bin span=1h _time 
+| stats count as val by src_ip _time
+| where val > 1000
+| sort -val
+| table _time src_ip val
