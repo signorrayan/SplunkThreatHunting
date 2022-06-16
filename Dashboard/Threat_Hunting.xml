@@ -317,6 +317,66 @@
       </table>
     </panel>
   </row>
+   <row>
+    <panel>
+      <title>Zeek_DNS_Mining_Pool</title>
+      <table>
+        <search>
+          <query>index=zeek ((query="*monerohash.com" OR query="*do-dear.com" OR query="*xmrminerpro.com" OR query="*secumine.net" OR query="*xmrpool.com" OR query="*minexmr.org" OR query="*hashanywhere.com" OR query="*xmrget.com" OR query="*mininglottery.eu" OR query="*minergate.com" OR query="*moriaxmr.com" OR query="*multipooler.com" OR query="*moneropools.com" OR query="*xmrpool.eu" OR query="*coolmining.club" OR query="*supportxmr.com" OR query="*minexmr.com" OR query="*hashvault.pro" OR query="*xmrpool.net" OR query="*crypto-pool.fr" OR query="*xmr.pt" OR query="*miner.rocks" OR query="*walpool.com" OR query="*herominers.com" OR query="*gntl.co.uk" OR query="*semipool.com" OR query="*coinfoundry.org" OR query="*cryptoknight.cc" OR query="*fairhash.org" OR query="*baikalmine.com" OR query="*tubepool.xyz" OR query="*fairpool.xyz" OR query="*asiapool.io" OR query="*coinpoolit.webhop.me" OR query="*nanopool.org" OR query="*moneropool.com" OR query="*miner.center" OR query="*prohash.net" OR query="*poolto.be" OR query="*cryptoescrow.eu" OR query="*monerominers.net" OR query="*cryptonotepool.org" OR query="*extrmepool.org" OR query="*webcoin.me" OR query="*kippo.eu" OR query="*hashinvest.ws" OR query="*monero.farm" OR query="*linux-repository-updates.com" OR query="*1gh.com" OR query="*dwarfpool.com" OR query="*hash-to-coins.com" OR query="*pool-proxy.com" OR query="*hashfor.cash" OR query="*fairpool.cloud" OR query="*litecoinpool.org" OR query="*mineshaft.ml" OR query="*abcxyz.stream" OR query="*moneropool.ru" OR query="*cryptonotepool.org.uk" OR query="*extremepool.org" OR query="*extremehash.com" OR query="*hashinvest.net" OR query="*unipool.pro" OR query="*crypto-pools.org" OR query="*monero.net" OR query="*backup-pool.com" OR query="*mooo.com" OR query="*freeyy.me" OR query="*cryptonight.net" OR query="*shscrypto.net") AND  NOT (((answers="127.0.0.1" OR answers="0.0.0.0") OR rejected="true")))
+| table _time id.orig_h,id.resp_h,query,answers,qtype_name,rcode_name
+| sort -_time</query>
+          <earliest>-2d</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="query">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="answers">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Zeek_Uri_Inbound</title>
+      <table>
+        <search>
+          <query>index=zeek source="/var/log/nsm/zeek/current/http.log" uri=* NOT src_ip IN ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
+| stats dc(uri) as dc values(uri) as uri earliest(_time) as Earliest latest(_time) as Latest by src_ip dest_ip
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(Earliest),ctime(Latest)
+| sort -Latest
+| table Earliest Latest src_ip dest_ip dc uri</query>
+          <earliest>-12h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
   <row>
     <panel>
       <title>Suspicious_Successful_Logons</title>
@@ -363,6 +423,73 @@ OR
   </row>
   <row>
     <panel>
+      <title>Zeek_Post_Requests</title>
+      <table>
+        <search>
+          <query>index=zeek source="/var/log/nsm/zeek/current/http.log" uri=* method=POST id.resp_h="10.*" NOT id.orig_h IN ("10.*", "172.16.0.0/12","192.168.0.0/16")
+| stats count
+        earliest(_time) AS earliest
+        VALUES(origin) as origin 
+        VALUES(referrer) AS referrer 
+        VALUES(request_body_len) AS request_body_len 
+        VALUES(response_body_len) AS response_body_len 
+        VALUES(status_code) AS status_code 
+        by src dest uri _time method
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest)
+| sort -_time
+| table earliest src dest uri method request_body_len response_body_len origin referer status_code</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="uri">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>High_DNS_Requests_Rate</title>
+      <table>
+        <search>
+          <query>index=zeek source="/var/log/nsm/zeek/current/dns.log" dest_port="53" NOT id.orig_h IN (10.100.135.135, 77.104.125.190, 10.108.16.137, 10.112.56.249) NOT query IN ("*.10.in-addr.arpa", "*.172.in-addr.arpa", "monitoring", "*.ab.net") 
+| bin span=1h _time 
+| stats count as val by src_ip _time
+| where val &gt; 1000
+| sort -val
+| table _time src_ip val</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="val">
+          <colorPalette type="minMidMax" maxColor="#5A4575" midColor="#FFFFFF" minColor="#708794"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>    
+  <row>
+    <panel>
       <title>Suspicious_Domain_Query</title>
       <table>
         <search>
@@ -387,6 +514,34 @@ OR
           <colorPalette type="sharedList"></colorPalette>
           <scale type="sharedCategory"></scale>
         </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Other_User_Password_Changing</title>
+      <table>
+        <search>
+          <query>index=wineventlog EventCode=4724 user!="healthmailbox*"
+|  stats count values(user) AS TargetUser latest(_time) AS LatestTime by src_user
+| rename src_user AS SrcUser
+| sort -count
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(LatestTime) 
+| table LatestTime SrcUser TargetUser count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
       </table>
     </panel>
   </row>
