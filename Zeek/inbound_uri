@@ -1,0 +1,5 @@
+index=zeek source="/var/log/nsm/zeek/current/http.log" uri=* NOT src_ip IN ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
+| stats dc(uri) as dc values(uri) as uri earliest(_time) as Earliest latest(_time) as Latest by src_ip dest_ip
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(Earliest),ctime(Latest)
+| sort -Latest
+| table Earliest Latest src_ip dest_ip dc uri
