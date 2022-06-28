@@ -1,0 +1,5 @@
+index=fortigate type="traffic" appcat="Proxy" NOT action IN (deny, blocked)
+| stats Count  values(dstip) as DestinationIP first(_raw) as Rawlog by srcip app service
+| rename srcip AS SourceIP app AS  Type service AS Service
+| sort -Count
+| table SourceIP DestinationIP Service Type Count Rawlog
