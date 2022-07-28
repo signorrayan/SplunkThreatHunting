@@ -236,6 +236,41 @@
   </row>
   <row>
     <panel>
+      <title>Data_Exfiltration</title>
+      <table>
+        <search>
+          <query>index=fortigate sourcetype="fortigate_traffic" type="traffic" dstcountry!="Reserved"
+| stats earliest(_time) as earliest latest(_time) as latest sum(sentbyte) as total_bytes_out  sum(rcvdbyte) as total_bytes_in  sum(duration) as duration by srcip dstip dstport policyname action
+|eval total_bytes_in = ROUND((total_bytes_in/pow(1024,3)),1),
+    total_bytes_out = ROUND((total_bytes_out/pow(1024,3)),1),
+    total_transferred = (total_bytes_in + total_bytes_out)
+| where total_bytes_out &gt;= 0.2
+| sort - total_transferred
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest) ctime(latest) 
+| table earliest, latest, srcip, dstip, dstport, total_bytes_out, total_bytes_in, total_transferred, duration, policyname, action</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="total_bytes_out">
+          <colorPalette type="list">[#CBA700,#D94E17,#D41F1F]</colorPalette>
+          <scale type="threshold">1,2</scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
       <title>SMTP_Requests</title>
       <table>
         <search>
