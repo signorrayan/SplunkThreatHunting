@@ -1,0 +1,9 @@
+index=fortigate sourcetype="fortigate_traffic" type="traffic" dstcountry!="Reserved"
+| stats earliest(_time) as earliest latest(_time) as latest sum(sentbyte) as total_bytes_out  sum(rcvdbyte) as total_bytes_in  sum(duration) as duration by srcip dstip dstport policyname action
+|eval Received_GB = ROUND((total_bytes_in/pow(1024,3)),1),
+    Sent_GB = ROUND((total_bytes_out/pow(1024,3)),1),
+    TotalTransferred = (Sent_GB + Received_GB)
+| where Sent_GB >= 0.2
+| sort - TotalTransferred
+| convert timeformat="%Y-%m-%d %H:%M:%S" ctime(earliest) ctime(latest) 
+| table earliest, latest, srcip, dstip, dstport, Sent_GB, Received_GB, TotalTransferred, duration, policyname, action
